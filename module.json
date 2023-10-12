@@ -8,8 +8,8 @@
 	"styles": ["herohome.css"],
 	 "socket": true,
     "url": "https://github.com/Handyfon/herohomeModule/tree/master",
-    "manifest": "https://raw.githubusercontent.com/Handyfon/herohomeModule/master/module.json",
-    "download": "https://github.com/Handyfon/herohomeModule/raw/master/herohome.zip",
+    "manifest": "https://raw.githubusercontent.com/Handyfon/herohomeModule/main/module.json",
+    "download": "https://github.com/Handyfon/herohomeModule/raw/main/herohome.zip",
 	"minimumCoreVersion": "10",
 	"compatibleCoreVersion": "11"
 }
