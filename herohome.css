@@ -1,0 +1,124 @@
+button.herohome-button {
+    max-width: 90px !important;
+    width: 100%;
+    color: white;
+    border-color: black;
+    margin: 0;
+    padding: 0 4px;
+    background: #5556;
+    border: 1px solid #7778;
+    border-bottom: 0;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.herohome-character-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column-reverse;
+}
+  
+.herohome-character {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  filter: grayscale(1) brightness(0.8);
+}
+.herohome-character:hover {
+  filter: none;
+}
+
+.herohome-character img {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  /* border-radius: 900px; */
+  border: unset;
+  object-fit: cover;
+  object-position: top;
+}
+
+.herohome-character div {
+  display: flex;
+  flex-grow: 1;
+}
+
+.herohome-character-name {
+  font-size: 15px;
+  min-width: 100px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.herohome-character-created-at {
+  font-size: 12px;
+  width: 125px;
+  /* background: red; */
+  max-width: 125px;
+  min-width: 125px;
+  font-style: italic;
+  color: grey;
+  text-align: center;
+  align-self: center;
+}
+
+.herohome-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.herohome-button {
+  font-size: 12px;
+}
+
+.herohome-button i {
+  margin-right: 5px;
+}
+.herohome-character-details-div {
+  flex: 1 1 0%;
+  padding-left: 10px;
+}
+.herohome-current-character {
+  display: inline-flex;
+  width: 100%;
+}
+img.herohome-currentCharacterImage {
+  max-height: 100px;
+}
+.herohome-current-character.notUploaded {
+    background: #ff8d0040;
+}
+button.herohome-upload.notUploaded {
+  background: #975300;
+  border: red;
+  color: orange;
+}
+
+.herohome-current-character.isUploaded {
+  background: #00ff001f;
+}
+button.herohome-upload.isUploaded {
+  background: darkgreen;
+  color: lightgreen;
+}
+li.herohome-character.hhThisActor {
+  filter: unset;
+  background: #90ee9036;
+  border-top: 2px solid green;
+  border-bottom: 2px solid green;
+}
+button.herohome-sync.hhSynced {
+  background: green;
+  color: lightgreen;
+  border: 1px solid;
+}
+li.herohome-character.hhThisActor.hhSynced {
+  color: green;
+}
+span.herohome-character-sync {
+  display: block;
+  color: green;
+  font-weight: bold;
+  font-size: 13px;
+}
