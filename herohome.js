@@ -55,10 +55,88 @@ Hooks.once('ready', function() {
 
         const closeButton = html.find('.configure-sheet');
         closeButton.before(button);
+        console.log(app.actor.flags.herohome.lastsync);
+        //IF ACTOR IS IN HEROHOME CHECK IF THE LASTVERSION ON THE HEROHOME IS NEWER THEN THE CURRENT VERSION
+        //CREATE POPUP TO ASK TO DOWNLOAD THE NEWER VERSION THAT DOES JUST THAT WHEN ACCEPTED.
+        checkForNewVersion(app.actor);
     });
 
     HeroHome.startTimer();
+    if (game.user.isGM) {
+        // Select the journal sidebar container
+        let journalSidebar = $(".journal-sidebar");
+        
+        // Create the new button element
+        let newButton = $("<button>").addClass("heroHomeSyncJournal")
+        .html('<i class="fas fa-icon-of-your-choice"></i> <b>Hero Home Sync</b>')
+        .on('click', syncJournalToFallback);
+        // Append the new button just after the header inside the journalSidebar
+        journalSidebar.find(".directory-header").after(newButton);
+    }
 });
+
+async function checkForNewVersion(currentCharacter) {
+    let token = await game.settings.get('herohome', 'token');
+    try {
+        const response = await fetch(`https://herohome.me/api/download_character/${currentCharacter.flags.herohome.characterid}/`, {
+            headers: {
+                'Secret-Key': token,
+            },
+        });
+
+        if (response.ok) {
+            const characterData = await response.json();
+
+            // Use lastsync from the fetched characterData
+            const heroHomeLastSync = new Date(characterData.flags.herohome.lastsync);
+            const actorLastSync = new Date(currentCharacter.flags.herohome?.lastsync);
+
+            if (new Date(heroHomeLastSync) > new Date(actorLastSync)) {
+                const updateDialogOptions = {
+                    title: 'Update Character',
+                    content: '<p>A newer version of this character is available on HeroHome. Do you want to update?</p>',
+                    buttons: {
+                        yes: {
+                            icon: '<i class="fas fa-download"></i>',
+                            label: 'Update',
+                            callback: async () => {
+                                await currentCharacter.update({
+                                    'flags.herohome.lastsync': characterData.flags.herohome.lastsync,
+                                });
+                                // Remove old items from the actor
+                                const itemIDs = currentCharacter.items.map(i => i.id);
+                                await currentCharacter.deleteEmbeddedDocuments("Item", itemIDs);
+
+                                // Remove old effects from the actor
+                                const effectIDs = currentCharacter.effects.map(e => e.id);
+                                await currentCharacter.deleteEmbeddedDocuments("ActiveEffect", effectIDs);
+
+                                // Update the actor with the new data
+                                await currentCharacter.update(characterData);
+                                await currentCharacter.update({
+                                    'flags.herohome.lastsync': characterData.flags.herohome.lastsync,
+                                });
+                            }
+                        },
+                        no: {
+                            icon: '<i class="fas fa-times"></i>',
+                            label: 'Cancel',
+                            callback: () => {}
+                        }
+                    },
+                    default: 'no'
+                };
+
+                new Dialog(updateDialogOptions).render(true);
+            }
+        } else {
+            console.error('Error:', response.status);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
 async function loadCharacterList(currentCharacter) {
     let token = await game.settings.get('herohome', 'token');
     const dialogOptions = {
@@ -104,6 +182,39 @@ async function loadCharacterList(currentCharacter) {
     } catch (error) {
         console.error('Error:', error);
     }
+}
+function syncJournalToFallback() {
+    const folders = Array.from(game.journal.folders.values()).map(folder => folder.data);
+    const journalEntries = game.journal._source;
+
+    // Create a combined data structure
+    const combinedData = {
+        folders: folders,
+        journalEntries: journalEntries
+    };
+
+    // Convert the combined data to a string for transmission
+    const dataToSend = JSON.stringify(combinedData);
+
+    // Make an AJAX request to your Django backend
+    $.ajax({
+        type: 'POST',
+        url: 'https://herohome.me/api/worldsync/',
+        headers: {
+            'Content-Type': 'application/json',
+            'Secret-Key': game.settings.get('herohome', 'token')
+        },
+        data: JSON.stringify({
+            foundry_world_id: game.world.id,
+            journal_content: dataToSend  // Send the combined data
+        }),
+        success: function(response) {
+            console.log("Successfully synced journals:", response);
+        },
+        error: function(error) {
+            console.error("Error syncing journals:", error);
+        }
+    });
 }
 function timeDifference(current, previous) {
     const msPerMinute = 60 * 1000;
@@ -221,7 +332,32 @@ function displayCharacterList(characters, currentCharacter, token) {
 
     attachButtonListeners(token);
 }
+async function uploadCharacterImages(characterId, characterImageBlob, tokenImageBlob) {
+    let token = await game.settings.get('herohome', 'token');
+    const formData = new FormData();
+    formData.append('character_id', characterId);
+    formData.append('character_image', characterImageBlob, "character_image.png");
+    formData.append('token_image', tokenImageBlob, "token_image.png");
 
+    try {
+        const response = await fetch('https://herohome.me/api/upload_character_images/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Secret-Key': token,
+            },
+        });
+
+        if (response.ok) {
+            ui.notifications.notify("Images uploaded successfully!");
+        } else {
+            console.error('Error:', response.status);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+    //TODO:SET IMAGE-PATHS TO PATHS FROM RESPONSE
+}
 function attachButtonListeners(token) {
     $('.herohome-upload').on('click', async function () {
         const characterId = $(this).data('character-id');
@@ -247,6 +383,14 @@ function attachButtonListeners(token) {
                         'flags.herohome.synced': false,
                         'flags.herohome.characterid': characterId
                       });
+                       // Fetch and append the character image
+                    const characterImageResponse = await fetch(actor.img);
+                    const characterImageBlob = await characterImageResponse.blob();
+                    
+                    // Fetch and append the token image
+                    const tokenImageResponse = await fetch(actor.prototypeToken.texture.src);
+                    const tokenImageBlob = await tokenImageResponse.blob();
+                    await uploadCharacterImages(characterId, characterImageBlob, tokenImageBlob);
                     await loadCharacterList(actor);
                 } else {
                     console.error('Error:', response.status);
@@ -290,7 +434,7 @@ function attachButtonListeners(token) {
               const responseData = await response.json();
               const newCharacterID = responseData.characterid;
               const { created_at } = responseData; // Get the created_at field from the response
-              ui.notifications.notify('Character ' + game.user.character.name + ' has been synced to HeroHome');
+              ui.notifications.notify('Character ' + data.name + ' has been synced to HeroHome');
               actor.update({
                 'flags.herohome.synced': false,
                 'flags.herohome.characterid': newCharacterID,
@@ -328,12 +472,26 @@ function attachButtonListeners(token) {
                 const characterData = await response.json();
     
                 if (actor) {
-                    // Overwrite the actor with the new data
+                    // Remove old items from the actor
+                    const itemIDs = actor.items.map(i => i.id);
+                    await actor.deleteEmbeddedDocuments("Item", itemIDs);
+    
+                    // Remove old effects from the actor
+                    const effectIDs = actor.effects.map(e => e.id);
+                    await actor.deleteEmbeddedDocuments("ActiveEffect", effectIDs);
+
+                    // Now, update the actor with the new data
                     await actor.update(characterData);
+    
+                    // Update additional flags
                     await actor.update({
-                        'flags.herohome.characterid': characterId
+                        'flags.herohome.characterid': characterId,
+                        'flags.herohome.lastsync': characterData.flags.herohome.lastsync,
                     });
+    
+                    // Rerender the actor's sheet
                     actor.sheet.render(true);
+    
                     ui.notifications.notify('Character ' + actor.name + ' has been updated');
                     await loadCharacterList(actor);
                 } else {

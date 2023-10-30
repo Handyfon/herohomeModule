@@ -2,7 +2,7 @@
 	"name": "herohome",
 	"title": "Hero Home Sync",
 	"description": "Sync your characters with herohome - every hero needs a home",
-	"version": "11.1",
+	"version": "11.3",
 	"author": "Handyfon#8390",
 	"esmodules": ["herohome.js"],
 	"styles": ["herohome.css"],
