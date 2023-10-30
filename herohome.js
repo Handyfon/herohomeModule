@@ -56,8 +56,6 @@ Hooks.once('ready', function() {
         const closeButton = html.find('.configure-sheet');
         closeButton.before(button);
         console.log(app.actor.flags.herohome.lastsync);
-        //IF ACTOR IS IN HEROHOME CHECK IF THE LASTVERSION ON THE HEROHOME IS NEWER THEN THE CURRENT VERSION
-        //CREATE POPUP TO ASK TO DOWNLOAD THE NEWER VERSION THAT DOES JUST THAT WHEN ACCEPTED.
         checkForNewVersion(app.actor);
     });
 
@@ -93,7 +91,7 @@ async function checkForNewVersion(currentCharacter) {
 
             if (new Date(heroHomeLastSync) > new Date(actorLastSync)) {
                 const updateDialogOptions = {
-                    title: 'Update Character',
+                    title: 'Herohome Sync',
                     content: '<p>A newer version of this character is available on HeroHome. Do you want to update?</p>',
                     buttons: {
                         yes: {
