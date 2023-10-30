@@ -332,7 +332,7 @@ function displayCharacterList(characters, currentCharacter, token) {
 
     attachButtonListeners(token);
 }
-async function uploadCharacterImages(characterId, characterImageBlob, tokenImageBlob) {
+async function uploadCharacterImages(characterId, characterImageBlob, tokenImageBlob, actorid) {
     let token = await game.settings.get('herohome', 'token');
     const formData = new FormData();
     formData.append('character_id', characterId);
@@ -349,14 +349,29 @@ async function uploadCharacterImages(characterId, characterImageBlob, tokenImage
         });
 
         if (response.ok) {
-            ui.notifications.notify("Images uploaded successfully!");
+            const responseData = await response.json();
+            const characterImageUrl = responseData.character_image_url;
+            const tokenImageUrl = responseData.token_image_url;
+
+            // Assuming you have the actor object available
+            const actor = game.actors.get(actorid);
+            if (actor) {
+                // Update the actor's image paths
+                await actor.update({
+                    "img": characterImageUrl,
+                    "token.img": tokenImageUrl
+                });
+
+                ui.notifications.notify("Images uploaded and updated successfully!");
+            } else {
+                console.error('Error: Actor not found');
+            }
         } else {
             console.error('Error:', response.status);
         }
     } catch (error) {
         console.error('Error:', error);
     }
-    //TODO:SET IMAGE-PATHS TO PATHS FROM RESPONSE
 }
 function attachButtonListeners(token) {
     $('.herohome-upload').on('click', async function () {
@@ -390,7 +405,7 @@ function attachButtonListeners(token) {
                     // Fetch and append the token image
                     const tokenImageResponse = await fetch(actor.prototypeToken.texture.src);
                     const tokenImageBlob = await tokenImageResponse.blob();
-                    await uploadCharacterImages(characterId, characterImageBlob, tokenImageBlob);
+                    await uploadCharacterImages(characterId, characterImageBlob, tokenImageBlob, actor.id);
                     await loadCharacterList(actor);
                 } else {
                     console.error('Error:', response.status);
