@@ -1,15 +1,17 @@
 {
-	"name": "herohome",
-	"title": "Hero Home Sync",
-	"description": "Sync your characters with herohome - every hero needs a home",
-	"version": "11.31",
-	"author": "Handyfon#8390",
-	"esmodules": ["herohome.js"],
-	"styles": ["herohome.css"],
-	 "socket": true,
-    "url": "https://github.com/Handyfon/herohomeModule/tree/master",
-    "manifest": "https://raw.githubusercontent.com/Handyfon/herohomeModule/main/module.json",
-    "download": "https://github.com/Handyfon/herohomeModule/raw/main/herohome.zip",
-	"minimumCoreVersion": "10",
-	"compatibleCoreVersion": "11"
+  "name": "herohome",
+  "title": "Hero Home Sync",
+  "description": "Sync your characters with herohome - every hero needs a home",
+  "version": "13.0",
+  "author": "Handyfon#8390",
+  "esmodules": ["herohome.js"],
+  "styles": ["herohome.css"],
+  "socket": true,
+  "url": "https://github.com/Handyfon/herohomeModule/tree/master",
+  "manifest": "https://raw.githubusercontent.com/Handyfon/herohomeModule/main/module.json",
+  "download": "https://github.com/Handyfon/herohomeModule/raw/main/herohome.zip",
+  "compatibility": {
+    "minimum": "10",
+    "verified": "13"
+  }
 }
