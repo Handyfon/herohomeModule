@@ -12,52 +12,63 @@ Hooks.once('init', function() {
 });
 
 Hooks.once('ready', function() {
-    Hooks.on('renderActorSheet', async (app, html, data) => {
-        const button = $('<a class="herohome-button" title="HeroHome Import/export"><i class="fa-solid fa-vault navIcon" style="place-self: center;"></i>HeroHome</a>');
-        button.on('click', async (event) => {
-            let token = await game.settings.get('herohome', 'token');
-            if (!token) {
-                const dialogContent = `
-                    <p>Please set your HeroHome token to access the import/export feature.</p>
-                    <p>Visit the HeroHome website to generate a token:</p>
-                    <a href="https://herohome.me/secret_key/" target="_blank">Generate Token</a>
-                    <div class="herohome-token-input">
-                        <label for="herohome-token">Enter Token:</label>
-                        <input type="text" id="herohome-token" name="herohome-token">
-                    </div>
-                `;
-                
-                const dialogOptions = {
-                    title: 'Set HeroHome Token',
-                    content: dialogContent,
-                    buttons: {
-                        ok: {
-                            icon: '<i class="fas fa-check"></i>',
-                            label: 'OK',
-                            callback: async (html) => {
-                                const enteredToken = html.find('#herohome-token').val();
-                                if (enteredToken) {
-                                    token = enteredToken;
-                                    await game.settings.set('herohome', 'token', token);
-                                    await loadCharacterList(app.actor);
-                                }
+Hooks.on('renderActorSheetV2', async (app, html, data) => {
+    const button = $('<a class="herohome-button" title="HeroHome Import/export"><i class="fa-solid fa-vault navIcon" style="place-self: center;"></i>HeroHome</a>');
+    
+    button.on('click', async (event) => {
+        let token = await game.settings.get('herohome', 'token');
+        if (!token) {
+            const dialogContent = `
+                <p>Please set your HeroHome token to access the import/export feature.</p>
+                <p>Visit the HeroHome website to generate a token:</p>
+                <a href="https://herohome.me/secret_key/" target="_blank">Generate Token</a>
+                <div class="herohome-token-input">
+                    <label for="herohome-token">Enter Token:</label>
+                    <input type="text" id="herohome-token" name="herohome-token">
+                </div>
+            `;
+            
+            const dialogOptions = {
+                title: 'Set HeroHome Token',
+                content: dialogContent,
+                buttons: {
+                    ok: {
+                        icon: '<i class="fas fa-check"></i>',
+                        label: 'OK',
+                        callback: async (html) => {
+                            const enteredToken = html.find('#herohome-token').val();
+                            if (enteredToken) {
+                                token = enteredToken;
+                                await game.settings.set('herohome', 'token', token);
+                                await loadCharacterList(app.actor);
                             }
                         }
-                    },
-                    default: 'ok'
-                };
-    
-                new Dialog(dialogOptions).render(true);
-            } else {
-                await loadCharacterList(app.actor);
-            }
-        });
+                    }
+                },
+                default: 'ok'
+            };
 
-        const closeButton = html.find('.configure-sheet');
-        closeButton.before(button);
-        console.log(app.actor.flags.herohome.lastsync);
-        checkForNewVersion(app.actor);
+            new Dialog(dialogOptions).render(true);
+        } else {
+            await loadCharacterList(app.actor);
+        }
     });
+
+    const $html = $(html);
+    const header = $html.closest('.application').find('.window-header');
+    if (header.length) {
+    const closeButton = header.find('button[data-action="close"]');
+    if (closeButton.length) {
+        button.addClass("header-control");
+        closeButton.before(button); // ← direkt davor einfügen
+    } else {
+        header.append(button); // fallback
+    }
+    }
+    console.log(app.actor.flags.herohome.lastsync);
+    checkForNewVersion(app.actor);
+});
+
 
     HeroHome.startTimer();
     if (game.user.isGM) {
@@ -182,8 +193,8 @@ async function loadCharacterList(currentCharacter) {
     }
 }
 function syncJournalToFallback() {
-    const folders = Array.from(game.journal.folders.values()).map(folder => folder.data);
-    const journalEntries = game.journal._source;
+    const folders = Array.from(game.journal.folders.values()).map(folder => folder.toObject());
+    const journalEntries = game.journal.contents.map(j => j.toObject());
 
     // Create a combined data structure
     const combinedData = {
