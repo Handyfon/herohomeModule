@@ -1,136 +1,648 @@
-button.herohome-button {
-    max-width: 90px !important;
-    width: 100%;
-    color: white;
-    border-color: black;
-    margin: 0;
-    padding: 0 4px;
-    background: #5556;
-    border: 1px solid #7778;
-    border-bottom: 0;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+/* ==========================================================================
+   Hero Home — Foundry module styles
+   Matches the herohome.me design system: deep slate surfaces, antique gold.
+   ========================================================================== */
+
+:root {
+    --hh-bg-0: #0a0c10;
+    --hh-bg-1: #12151c;
+    --hh-bg-2: #191e28;
+    --hh-bg-3: #232936;
+    --hh-border: #2a3040;
+    --hh-border-strong: #3d455c;
+    --hh-text: #e9e7e2;
+    --hh-text-muted: #9aa1af;
+    --hh-text-faint: #6b7280;
+    --hh-accent: #d4a843;
+    --hh-accent-bright: #eec76a;
+    --hh-accent-soft: rgba(212, 168, 67, 0.12);
+    --hh-danger: #d95454;
+    --hh-success: #4cae7e;
+    --hh-success-bg: #12301f;
+    --hh-warn: #e8a33d;
+    --hh-warn-bg: #3a2a10;
+    --hh-radius: 10px;
+    --hh-radius-sm: 7px;
 }
-.herohome-character-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column-reverse;
+
+/* --- Sheet header button — matches the native header controls ------------- */
+a.herohome-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: inherit;
+    border-radius: var(--hh-radius-sm);
+    cursor: pointer;
 }
-  
-.herohome-character {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  filter: grayscale(1) brightness(0.8);
+
+a.herohome-button:hover {
+    text-shadow: 0 0 8px var(--color-shadow-primary, rgba(255, 255, 255, 0.45));
 }
-.herohome-character:hover {
-  filter: none;
-}
+
+a.herohome-button i { margin-right: 2px; }
+
+/* --- Journal sync button --------------------------------------------------- */
 button.heroHomeSyncJournal {
-  max-height: 20px !important;
-  background: #3e3e3e;
-  border: unset;
-  border-radius: 5px;
-  color: white;
-  width: 66%;
-  border: 1px solid white;
-  align-self: center;
-  margin-bottom: 5px;
-  height: 20px !important;
-  line-height: 5px;
-}
-.herohome-character img {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-  /* border-radius: 900px; */
-  border: unset;
-  object-fit: cover;
-  object-position: top;
+    height: 24px !important;
+    max-height: 24px !important;
+    width: 66%;
+    align-self: center;
+    margin-bottom: 5px;
+    line-height: 1;
+    background: linear-gradient(180deg, var(--hh-accent-bright), var(--hh-accent));
+    border: 1px solid var(--hh-accent);
+    border-radius: var(--hh-radius-sm);
+    color: #1a1404;
+    font-weight: 700;
 }
 
-.herohome-character div {
-  display: flex;
-  flex-grow: 1;
+button.heroHomeSyncJournal:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 0 10px rgba(212, 168, 67, 0.4);
 }
 
-.herohome-character-name {
-  font-size: 15px;
-  min-width: 100px;
-  font-weight: bold;
-  text-transform: capitalize;
+/* --- Dialog content -------------------------------------------------------- */
+/* Foundry's window chrome is light by default — darken the whole window
+   content of any dialog that carries HeroHome content. */
+.window-content:has(.herohome-dialog-content),
+.dialog:has(.herohome-dialog-content) .window-content,
+.dialog .window-content:has(.herohome-dialog-content) {
+    background: var(--hh-bg-0);
+    color: var(--hh-text);
 }
 
-.herohome-character-created-at {
-  font-size: 12px;
-  width: 125px;
-  /* background: red; */
-  max-width: 125px;
-  min-width: 125px;
-  font-style: italic;
-  color: grey;
-  text-align: center;
-  align-self: center;
+.window-content:has(.herohome-dialog-content) .dialog-buttons button,
+.window-content:has(.herohome-dialog-content) button.dialog-button {
+    background: var(--hh-bg-2);
+    border: 1px solid var(--hh-border-strong);
+    border-radius: var(--hh-radius-sm);
+    color: var(--hh-text);
 }
 
-.herohome-buttons {
-  display: flex;
-  align-items: center;
+.window-content:has(.herohome-dialog-content) .dialog-buttons button:hover,
+.window-content:has(.herohome-dialog-content) button.dialog-button:hover {
+    border-color: var(--hh-accent);
+    color: var(--hh-accent-bright);
+    box-shadow: none;
 }
 
-.herohome-button {
-  font-size: 12px;
+.herohome-dialog-content {
+    background: var(--hh-bg-0);
+    color: var(--hh-text);
+    border-radius: var(--hh-radius);
+    padding: 12px;
+    border: 1px solid var(--hh-border);
 }
 
-.herohome-button i {
-  margin-right: 5px;
+.herohome-dialog-content a { color: var(--hh-accent-bright); }
+.herohome-dialog-content p { color: var(--hh-text); }
+.herohome-dialog-content label { color: var(--hh-text-muted); }
+
+/* List dialogs keep their full size even while content is still loading.
+   (Small confirmation/token dialogs only carry the generic class and stay compact.) */
+.herohome-sheet-content { min-height: 620px; }
+.herohome-campaign-content { min-height: 560px; }
+.herohome-import-content { min-height: 520px; }
+
+h1.heroHomeSectionHeader {
+    font-family: 'Palatino Linotype', 'Book Antiqua', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--hh-text);
+    border-bottom: 1px solid var(--hh-border);
+    padding-bottom: 6px;
+    margin: 12px 0 10px;
 }
-.herohome-character-details-div {
-  flex: 1 1 0%;
-  padding-left: 10px;
-}
+
+/* --- Current character card ------------------------------------------------ */
 .herohome-current-character {
-  display: inline-flex;
-  width: 100%;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+    padding: 10px;
+    background: var(--hh-bg-1);
+    border: 1px solid var(--hh-border);
+    border-radius: var(--hh-radius);
 }
-img.herohome-currentCharacterImage {
-  max-height: 100px;
-}
+
 .herohome-current-character.notUploaded {
-    background: #ff8d0040;
-}
-button.herohome-upload.notUploaded {
-  background: #975300;
-  border: red;
-  color: orange;
+    background: var(--hh-warn-bg);
+    border-color: #7a5a29;
 }
 
 .herohome-current-character.isUploaded {
-  background: #00ff001f;
+    background: var(--hh-success-bg);
+    border-color: #2e6e4e;
 }
-button.herohome-upload.isUploaded {
-  background: darkgreen;
-  color: lightgreen;
+
+img.herohome-currentCharacterImage {
+    max-height: 84px;
+    max-width: 84px;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid var(--hh-border-strong);
+    border-radius: var(--hh-radius-sm);
+    background: var(--hh-bg-2);
 }
-li.herohome-character.hhThisActor {
-  filter: unset;
-  background: #90ee9036;
-  border-top: 2px solid green;
-  border-bottom: 2px solid green;
+
+.herohome-character-details-div {
+    flex: 1 1 0%;
+    padding-left: 2px;
 }
-button.herohome-sync.hhSynced {
-  background: green;
-  color: lightgreen;
-  border: 1px solid;
-}
-li.herohome-character.hhThisActor.hhSynced {
-  color: green;
-}
+
 span.herohome-character-sync {
-  display: block;
-  color: green;
-  font-weight: bold;
-  font-size: 13px;
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--hh-success);
+}
+
+span.herohome-character-sync.disabled {
+    color: var(--hh-warn);
+}
+
+/* --- Character list -------------------------------------------------------- */
+.herohome-character-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column; /* lists are explicitly sorted newest-first in JS */
+    gap: 8px;
+}
+
+.herohome-character {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0;
+    padding: 8px 10px;
+    background: var(--hh-bg-1);
+    border: 1px solid var(--hh-border);
+    border-radius: var(--hh-radius);
+    filter: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.herohome-character:hover {
+    border-color: var(--hh-accent);
+    background: var(--hh-bg-2);
+    filter: none;
+}
+
+.herohome-character img {
+    width: 44px;
+    height: 44px;
+    margin-right: 0;
+    border: 1px solid var(--hh-border-strong);
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top;
+    background: var(--hh-bg-2);
+}
+
+.herohome-character-info {
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.herohome-character-name {
+    font-size: 14px;
+    min-width: 0;
+    font-weight: 600;
+    text-transform: capitalize;
+    color: var(--hh-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.herohome-character-created-at {
+    font-size: 11px;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    font-style: normal;
+    color: var(--hh-text-faint);
+    text-align: left;
+    align-self: center;
+}
+
+.herohome-character-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+/* System version pill (header + per character) */
+.herohome-version-pill {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hh-bg-3);
+    border: 1px solid var(--hh-border-strong);
+    color: var(--hh-text-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+}
+
+.herohome-version-pill.outdated {
+    background: var(--hh-warn-bg);
+    border-color: var(--hh-warn);
+    color: var(--hh-warn);
+}
+
+/* Confirmation dialog helpers */
+.herohome-hint {
+    font-size: 12px;
+    color: var(--hh-text-faint);
+}
+
+.herohome-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: rgba(217, 84, 84, 0.12);
+    border: 1px solid var(--hh-danger);
+    border-radius: var(--hh-radius-sm);
+    color: #f1b9b9;
+    font-size: 12.5px;
+}
+
+.herohome-warning i { margin-top: 2px; }
+
+/* Status pills */
+.herohome-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.herohome-pill-current {
+    background: var(--hh-accent-soft);
+    border: 1px solid var(--hh-accent);
+    color: var(--hh-accent-bright);
+}
+
+.herohome-pill-campaign {
+    background: var(--hh-success-bg);
+    border: 1px solid var(--hh-success);
+    color: var(--hh-success);
+}
+
+.herohome-pill-owner {
+    background: #14283a;
+    border: 1px solid #5aa9e6;
+    color: #a8d4f5;
+}
+
+/* Sidebar button below Create Actor / Create Folder — native Foundry look:
+   only layout is set, colors/borders are inherited from core button styles. */
+button.herohome-sidebar-button {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* Campaign vault toolbar (view + stack toggles) */
+.herohome-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.herohome-toolbar-buttons {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.herohome-toggle-group {
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    background: var(--hh-bg-1);
+    border: 1px solid var(--hh-border);
+    border-radius: var(--hh-radius-sm);
+}
+
+button.herohome-toggle {
+    width: 30px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 5px;
+    color: var(--hh-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+button.herohome-toggle:hover { background: var(--hh-bg-3); color: var(--hh-text); box-shadow: none; }
+
+button.herohome-toggle.active {
+    background: var(--hh-accent-soft);
+    color: var(--hh-accent-bright);
+}
+
+/* Stack badge (grouped versions of the same hero) */
+.herohome-stack-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: var(--hh-bg-3);
+    border: 1px solid var(--hh-border-strong);
+    color: var(--hh-text-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+.herohome-stack-badge:hover, .herohome-stack-badge.expanded {
+    background: var(--hh-accent-soft);
+    border-color: var(--hh-accent);
+    color: var(--hh-accent-bright);
+}
+
+li.herohome-character.hh-child {
+    border-style: dashed;
+    opacity: 0.88;
+}
+
+li.herohome-character.hh-child img { filter: saturate(0.6); }
+
+/* Grid view — card layout like the website vault */
+ul.herohome-character-list.herohome-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+}
+
+.herohome-grid .herohome-character {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0 0 8px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.herohome-grid .herohome-character img {
+    width: 100%;
+    height: 150px;
+    margin: 0;
+    border: none;
+    border-bottom: 1px solid var(--hh-border);
+    border-radius: 0;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.herohome-grid .herohome-character-info {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 8px 4px;
+}
+
+.herohome-grid .herohome-character-name { white-space: normal; }
+
+.herohome-grid .herohome-character-actions { justify-content: center; }
+
+/* Open-sheet button in the campaign overview */
+button.herohome-open-actor {
+    width: 32px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hh-success-bg);
+    border: 1px solid var(--hh-success);
+    border-radius: var(--hh-radius-sm);
+    color: var(--hh-success);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+button.herohome-open-actor:hover {
+    filter: brightness(1.2);
+}
+
+/* Highlight for the entry that matches the open sheet */
+li.herohome-character.hhThisActor {
+    filter: none;
+    background: var(--hh-accent-soft);
+    border: 1px solid var(--hh-accent);
+}
+
+li.herohome-character.hhThisActor.hhSynced {
+    color: inherit;
+    border-color: var(--hh-success);
+}
+
+/* --- Buttons ---------------------------------------------------------------- */
+.herohome-character-actions button,
+.herohome-character div button,
+button.herohome-upload,
+button.herohome-sync,
+button.herohome-download,
+button.herohome-overwrite {
+    width: 32px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hh-bg-2);
+    border: 1px solid var(--hh-border-strong);
+    border-radius: var(--hh-radius-sm);
+    color: var(--hh-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.herohome-character-actions button:hover,
+button.herohome-upload:hover,
+button.herohome-download:hover,
+button.herohome-overwrite:hover,
+button.herohome-sync:not([disabled]):hover {
+    border-color: var(--hh-accent);
+    color: var(--hh-accent-bright);
+    background: var(--hh-accent-soft);
+    box-shadow: none;
+}
+
+button.herohome-sync[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* Upload state colours */
+button.herohome-upload.notUploaded {
+    background: var(--hh-warn-bg);
+    border: 1px solid var(--hh-warn);
+    color: var(--hh-warn);
+}
+
+button.herohome-upload.isUploaded {
+    background: var(--hh-success-bg);
+    border: 1px solid var(--hh-success);
+    color: var(--hh-success);
+}
+
+button.herohome-sync.hhSynced {
+    background: var(--hh-success-bg);
+    border: 1px solid var(--hh-success);
+    color: var(--hh-success);
+}
+
+/* --- "Hero Home Character" option in the Create Actor dialog ---------------- */
+/* Native-looking entry inside the dnd5e type list (ol.card) — same look as
+   the regular actor-type rows, no brand colours. */
+li.herohome-create-option {
+    cursor: pointer;
+    border-top: 1px solid var(--color-border-light-tertiary, var(--hh-border));
+}
+
+li.herohome-create-option label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    height: 38px;
+}
+
+li.herohome-create-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+li.herohome-create-option .herohome-create-icon {
+    width: 32px;
+    flex: 0 0 32px;
+    text-align: center;
+    font-size: 20px;
+}
+
+li.herohome-create-option span { flex: 1; }
+
+li.herohome-create-option .herohome-create-import-icon {
+    flex: 0 0 auto;
+    margin-right: 4px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+
+button.herohome-create-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--hh-accent-soft);
+    border: 1px solid var(--hh-accent);
+    border-radius: var(--hh-radius-sm);
+    color: var(--hh-accent-bright);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+button.herohome-create-option:hover {
+    background: rgba(212, 168, 67, 0.22);
+    box-shadow: 0 0 12px rgba(212, 168, 67, 0.35);
+}
+
+button.herohome-create-option i {
+    font-size: 18px;
+    flex: 0 0 auto;
+}
+
+.herohome-create-option-label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.herohome-create-option-label small {
+    font-weight: 400;
+    color: var(--hh-text-muted);
+}
+
+/* Import picker */
+.herohome-import-list {
+    flex-direction: column;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+button.herohome-import {
+    width: 32px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hh-bg-2);
+    border: 1px solid var(--hh-border-strong);
+    border-radius: var(--hh-radius-sm);
+    color: var(--hh-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+button.herohome-import:hover {
+    border-color: var(--hh-accent);
+    color: var(--hh-accent-bright);
+    background: var(--hh-accent-soft);
+}
+
+/* Token-setup dialog */
+.herohome-token-input {
+    margin-top: 8px;
+}
+
+.herohome-token-input input {
+    background: var(--hh-bg-2);
+    border: 1px solid var(--hh-border-strong);
+    border-radius: var(--hh-radius-sm);
+    color: var(--hh-text);
+    padding: 6px 8px;
 }
